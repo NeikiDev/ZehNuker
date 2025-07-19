@@ -62,7 +62,7 @@ class Discord
     if (response.IsSuccessStatusCode)
     {
       string json = await response.Content.ReadAsStringAsync();
-      var webhook = JsonSerializer.Deserialize(json, JsonContext.Default.DiscordWebhook);
+      var webhook = JsonSerializer.Deserialize<DiscordWebhook>(json);
 
       if (webhook != null && webhook.url != null)
       {
@@ -112,7 +112,7 @@ class Discord
     if (response.IsSuccessStatusCode)
     {
       string jsonBody = await response.Content.ReadAsStringAsync();
-      var channel = JsonSerializer.Deserialize(jsonBody, JsonContext.Default.DiscordChannel);
+      var channel = JsonSerializer.Deserialize<DiscordChannel>(jsonBody);
 
       if (channel != null)
       {
@@ -151,7 +151,7 @@ class Discord
     if (response.IsSuccessStatusCode)
     {
       string json = await response.Content.ReadAsStringAsync();
-      var channels = JsonSerializer.Deserialize(json, JsonContext.Default.ListDiscordChannel);
+      var channels = JsonSerializer.Deserialize<List<DiscordChannel>>(json);
 
       if (channels == null) return null;
 
@@ -168,7 +168,7 @@ class Discord
     if (response.IsSuccessStatusCode)
     {
       string json = await response.Content.ReadAsStringAsync();
-      var guilds = JsonSerializer.Deserialize(json, JsonContext.Default.ListDiscordGuild);
+      var guilds = JsonSerializer.Deserialize<List<DiscordGuild>>(json);
       if (guilds == null) return null;
       return guilds;
     }
@@ -186,7 +186,7 @@ class Discord
     if (response.IsSuccessStatusCode)
     {
       string json = await response.Content.ReadAsStringAsync();
-      var user = JsonSerializer.Deserialize(json, JsonContext.Default.DiscordBotUser);
+      var user = JsonSerializer.Deserialize<DiscordBotUser>(json);
       if (user != null)
       {
         return user;

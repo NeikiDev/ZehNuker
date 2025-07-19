@@ -3,7 +3,7 @@ class Program
 {
 
   public static readonly int MESSAGES_PER_WEBHOOK = 100;
-  public static readonly int CHANNELS_TO_CREATE = 40;
+  public static readonly int CHANNELS_TO_CREATE = 20;
 
   public static async Task Main()
   {
