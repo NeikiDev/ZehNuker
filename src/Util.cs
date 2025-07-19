@@ -24,7 +24,7 @@ class Util
     List<string> list = [
       "Skidders",
       "Larps",
-      "JukerXD",
+      "AuaMeinZeh",
       "MrWebhook",
       "Pinger9000",
       "UWU",

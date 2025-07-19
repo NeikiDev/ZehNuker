@@ -1,1 +1,0 @@
-dotnet publish -c Release -r win-x64 /p:PublishSingleFile=true /p:SelfContained=true /p:EnableCompressionInSingleFile=true /p:PublishTrimmed=true /p:TrimMode=partial /p:IlcGenerateCompleteTypeMetadata=true /p:EnableAnalysisLogging=true

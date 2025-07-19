@@ -57,7 +57,7 @@ class Program
     Console.WriteLine("[!] The bot is a member of the following guilds:");
     foreach (var (guild, index) in guilds.Select((guild, index) => (guild, index)))
     {
-      Console.WriteLine($"[{index}] >> {guild.name} ({guild.id}) - Admin: {Util.BotIsAdmin(guild.permissions)}");
+      Console.WriteLine($"[{index}] >> {guild.name} - {guild.id} - Admin: {Util.BotIsAdmin(guild.permissions)}");
     }
 
     Console.Write("[?] Please enter the Guild ID from the list above: ");
