@@ -1,10 +1,13 @@
+using System.Text.Json.Serialization;
+
 public class DiscordGuild
 {
-  public string id { get; set; }
-  public string name { get; set; }
-  public string icon { get; set; }
-  public string banner { get; set; }
-  public bool owner { get; set; }
-  public string permissions { get; set; }
-  public List<string> features { get; set; }
+  [JsonPropertyName("id")]
+  public string? id { get; set; }
+
+  [JsonPropertyName("name")]
+  public string? name { get; set; }
+
+  [JsonPropertyName("permissions")]
+  public string? permissions { get; set; }
 }
