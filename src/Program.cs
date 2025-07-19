@@ -2,8 +2,8 @@
 class Program
 {
 
-  public static readonly Int32 MESSAGES_PER_WEBHOOK = 100;
-  public static readonly Int32 CHANNELS_TO_CREATE = 40;
+  public static readonly int MESSAGES_PER_WEBHOOK = 100;
+  public static readonly int CHANNELS_TO_CREATE = 40;
 
   public static async Task Main()
   {
@@ -24,7 +24,7 @@ class Program
     Console.Clear();
     Console.Write("[?] Please enter your Discord Bot Token: ");
 
-    String? token = Console.ReadLine();
+    string? token = Console.ReadLine();
 
     if (token == null)
     {
@@ -61,7 +61,7 @@ class Program
     }
 
     Console.Write("[?] Please enter the Guild ID from the list above: ");
-    String? guildId = Console.ReadLine();
+    string? guildId = Console.ReadLine();
 
     if (guildId == null || guilds.Find(x => x.id == guildId) == null)
     {
@@ -71,7 +71,7 @@ class Program
     }
 
     Console.Write("[?] Please enter the message you want to spam: ");
-    String? content = Console.ReadLine();
+    string? content = Console.ReadLine();
 
     if (content == null || content.Length <= 0 || content.Length >= 2000)
     {
@@ -82,21 +82,18 @@ class Program
 
     List<DiscordChannel>? channels = await Discord.GetChannels(token, guildId);
 
-    List<Task> deleteTasks = [];
-
     if (channels != null && channels.Count >= 1)
     {
       foreach (DiscordChannel channelToDelete in channels)
       {
-        deleteTasks.Add(Task.Run(async delegate
+        await Task.Run(async delegate
        {
          if (channelToDelete.id != null)
          {
            await Discord.DeleteChannel(token, channelToDelete.id);
          }
-       }));
+       });
       }
-      await Task.WhenAll(deleteTasks);
     }
     else
     {
@@ -143,8 +140,8 @@ class Program
 
   public static void Exit()
   {
-    Console.WriteLine("\n[!] Exiting Program in 5 seconds ...");
-    Thread.Sleep(5000);
+    Console.WriteLine("\n[!] Exiting Program in 10 seconds ...");
+    Thread.Sleep(10000);
     Environment.Exit(0);
   }
 }

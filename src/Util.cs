@@ -1,5 +1,8 @@
 class Util
 {
+  public static readonly string ADMIN_PERMISSION = "4503599627370495";
+
+
   public static string GetRandomString()
   {
     List<string> list = ["you suck", "die", "retard", "dummy", "noo my server gone nooo", "hoden"];
@@ -8,12 +11,12 @@ class Util
     return list[num];
   }
 
-  public static String BotIsAdmin(String? s)
+  public static string BotIsAdmin(String? s)
   {
-    return s != null && s.Equals("4503599627370495") ? "Yes" : "No";
+    return s != null && s.Equals(ADMIN_PERMISSION) ? "Yes" : "No";
   }
 
-  public static String GlobalTimeout(bool? b)
+  public static string GlobalTimeout(bool? b)
   {
     return b != null && b == true ? "GLOBAL" : "NORMAL";
   }

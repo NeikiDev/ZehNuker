@@ -168,7 +168,6 @@ class Discord
       string json = await response.Content.ReadAsStringAsync();
       var guilds = JsonSerializer.Deserialize(json, JsonContext.Default.ListDiscordGuild);
       if (guilds == null) return null;
-
       return guilds;
     }
     else
