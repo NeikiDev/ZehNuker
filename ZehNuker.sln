@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YUKER", "src\YUKER.csproj", "{F0F43920-A30E-D7E6-A3A2-E2E7C208A955}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZehNuker", "src\ZehNuker.csproj", "{F0F43920-A30E-D7E6-A3A2-E2E7C208A955}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

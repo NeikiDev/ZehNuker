@@ -12,6 +12,8 @@ class Discord
       var requestData = new
       {
         content = message,
+        username = Util.GetRandomName(),
+        avatar_url = Util.GetRandomAvatar()
       };
       string requestJson = JsonSerializer.Serialize(requestData);
       StringContent content = new(requestJson, Encoding.UTF8, "application/json");
@@ -97,7 +99,7 @@ class Discord
   {
     using HttpClient httpClient = new();
     httpClient.DefaultRequestHeaders.Add("Authorization", "Bot " + token);
-    string randomName = Util.GetRandomString();
+    string randomName = Util.GetRandomName();
     var requestData = new
     {
       name = randomName,

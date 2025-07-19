@@ -20,7 +20,7 @@ class Program
 
   public static async Task Init()
   {
-    Console.Title = "YUKER";
+    Console.Title = "ZehNuker";
     Console.Clear();
     Console.Write("[?] Please enter your Discord Bot Token: ");
 
@@ -43,7 +43,7 @@ class Program
     }
 
     Console.WriteLine($"[!] Successfully logged in as {user.username}#{user.discriminator} (ID: {user.id})");
-    Console.Title = $"YUKER - Logged in as {user.username}";
+    Console.Title = $"ZehNuker - Logged in as {user.username}";
 
     Console.WriteLine("[!] Retrieving bot's guilds ...");
     List<DiscordGuild>? guilds = await Discord.GetGuilds(token);
