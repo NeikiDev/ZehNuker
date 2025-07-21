@@ -48,7 +48,7 @@ class Discord
     }
   }
 
-  public static async Task CreateWebhookForChannel(string token, string channelId, List<DiscordWebhook> webhooks)
+  public static async Task<DiscordWebhook?> CreateWebhookForChannel(string token, string channelId)
   {
     using HttpClient httpClient = new();
     httpClient.DefaultRequestHeaders.Add("Authorization", "Bot " + token);
@@ -66,12 +66,13 @@ class Discord
 
       if (webhook != null && webhook.url != null)
       {
-        webhooks.Add(webhook);
         Console.WriteLine($"[+] Webhook successfully created for channel ID: {channelId}");
+        return webhook;
       }
       else
       {
         Console.WriteLine("[-] Failed to get discord webhook url");
+        return null;
       }
     }
     else if (response.StatusCode == HttpStatusCode.TooManyRequests)
@@ -83,15 +84,17 @@ class Discord
         int tryAgainTimeout = ratelimit.retry_after == null ? 1000 : (int)(ratelimit.retry_after * 1000);
         Console.WriteLine($"[RATELIMIT:{Util.GlobalTimeout(ratelimit.global)}] Retrying in {tryAgainTimeout} ms.");
         await Task.Delay(tryAgainTimeout);
-        await Task.Run(async delegate
+        return await Task.Run(async delegate
         {
-          await Discord.CreateWebhookForChannel(token, channelId, webhooks);
+          return await Discord.CreateWebhookForChannel(token, channelId);
         });
       }
+      return null;
     }
     else
     {
       Console.WriteLine($"[-] Failed to webhook channel {response.StatusCode}");
+      return null;
     }
   }
 
@@ -121,6 +124,22 @@ class Discord
       }
       return null;
     }
+    else if (response.StatusCode == HttpStatusCode.TooManyRequests)
+    {
+      string json = await response.Content.ReadAsStringAsync();
+      DiscordRatelimit? ratelimit = JsonSerializer.Deserialize<DiscordRatelimit>(json);
+      if (ratelimit != null)
+      {
+        int tryAgainTimeout = ratelimit.retry_after == null ? 1000 : (int)(ratelimit.retry_after * 1000);
+        Console.WriteLine($"[RATELIMIT:{Util.GlobalTimeout(ratelimit.global)}] Retrying in {tryAgainTimeout} ms.");
+        await Task.Delay(tryAgainTimeout);
+        return await Task.Run(async delegate
+        {
+          return await Discord.CreateChannel(token, guildId);
+        });
+      }
+      return null;
+    }
     else
     {
       Console.WriteLine("[-] Unable to create channel");
@@ -136,6 +155,21 @@ class Discord
     if (response.IsSuccessStatusCode)
     {
       Console.WriteLine($"[+] Deleted channel with id {channelId}");
+    }
+    else if (response.StatusCode == HttpStatusCode.TooManyRequests)
+    {
+      string json = await response.Content.ReadAsStringAsync();
+      DiscordRatelimit? ratelimit = JsonSerializer.Deserialize<DiscordRatelimit>(json);
+      if (ratelimit != null)
+      {
+        int tryAgainTimeout = ratelimit.retry_after == null ? 1000 : (int)(ratelimit.retry_after * 1000);
+        Console.WriteLine($"[RATELIMIT:{Util.GlobalTimeout(ratelimit.global)}] Retrying in {tryAgainTimeout} ms.");
+        await Task.Delay(tryAgainTimeout);
+        await Task.Run(async delegate
+        {
+          await Discord.DeleteChannel(token, channelId);
+        });
+      }
     }
     else
     {
