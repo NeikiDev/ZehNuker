@@ -93,7 +93,7 @@ class Discord
     }
     else
     {
-      Console.WriteLine($"[-] Failed to webhook channel {response.StatusCode}");
+      Console.WriteLine($"[-] Failed to create webhook channel {response.StatusCode}");
       return null;
     }
   }

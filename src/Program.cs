@@ -3,7 +3,7 @@ class Program
 {
 
   public static readonly int MESSAGES_PER_WEBHOOK = 100;
-  public static readonly int CHANNELS_TO_CREATE = 20;
+  public static readonly int CHANNELS_TO_CREATE = 10;
 
   public static async Task Main()
   {
@@ -161,13 +161,14 @@ class Program
 
     await Task.WhenAll(creationTasks);
 
-    await Task.Delay(2000);
+    await Task.Delay(2500);
 
     List<DiscordWebhook> webhooks = [];
+    List<Task> webhookTasks = [];
 
     foreach (DiscordChannel channel in createdChannels)
     {
-      _ = Task.Run(async () =>
+      var task = Task.Run(async () =>
       {
         if (channel != null && !string.IsNullOrWhiteSpace(channel.id))
         {
@@ -178,9 +179,10 @@ class Program
           }
         }
       });
+      webhookTasks.Add(task);
     }
 
-    await Task.Delay(1500);
+    await Task.WhenAll(webhookTasks);
 
     foreach (DiscordWebhook webhook in webhooks)
     {
