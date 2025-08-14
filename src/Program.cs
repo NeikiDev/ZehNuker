@@ -116,6 +116,32 @@ class Program
       return;
     }
 
+    int channels_to_create = CHANNELS_TO_CREATE;
+
+    Console.Write($"[?] How many channels would you like to create? Press Enter to use the default ({channels_to_create}): ");
+    string? channelsInput = Console.ReadLine();
+
+    if (!string.IsNullOrEmpty(channelsInput))
+    {
+      if (!int.TryParse(channelsInput, out channels_to_create))
+      {
+        channels_to_create = CHANNELS_TO_CREATE;
+      }
+    }
+
+    int messages_per_webhook = MESSAGES_PER_WEBHOOK;
+    Console.Write($"[?] How many messages should each webhook send? Press Enter to keep the default ({messages_per_webhook}): ");
+    string? webhookInput = Console.ReadLine();
+
+    if (!string.IsNullOrEmpty(webhookInput))
+    {
+      if (!int.TryParse(webhookInput, out messages_per_webhook))
+      {
+        messages_per_webhook = MESSAGES_PER_WEBHOOK;
+      }
+    }
+
+
     List<DiscordChannel>? channels = await Discord.GetChannels(token, guildId);
 
     if (channels != null && channels.Count >= 1)
@@ -142,7 +168,7 @@ class Program
     List<DiscordChannel> createdChannels = [];
     List<Task> creationTasks = [];
 
-    for (int i = 0; i < CHANNELS_TO_CREATE; i++)
+    for (int i = 0; i < channels_to_create; i++)
     {
       var task = Task.Run(async () =>
       {
@@ -190,7 +216,7 @@ class Program
       {
         _ = Task.Run(async () =>
       {
-        for (int i = 0; i < MESSAGES_PER_WEBHOOK; i++)
+        for (int i = 0; i < messages_per_webhook; i++)
         {
           await Discord.SendMessageToWebhook(webhook.url, content);
         }

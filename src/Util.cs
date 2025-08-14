@@ -48,9 +48,9 @@ class Util
     return list[num];
   }
 
-  public static string BotIsAdmin(String? s)
+  public static string BotIsAdmin(string? s)
   {
-    return s != null && s.Equals(ADMIN_PERMISSION) ? "Yes" : "No";
+    return s != null && s.Equals(ADMIN_PERMISSION) ? "YES" : "NO [!POTENTIAL MISSING PERMISSIONS!]";
   }
 
   public static string GlobalTimeout(bool? b)
