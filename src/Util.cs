@@ -1,7 +1,6 @@
 class Util
 {
-  public static readonly string ADMIN_PERMISSION = "4503599627370495";
-
+  public const ulong ADMINISTRATOR_PERMISSION = 1UL << 3;
 
   public static string GetRandomAvatar()
   {
@@ -50,7 +49,14 @@ class Util
 
   public static string BotIsAdmin(string? s)
   {
-    return s != null && s.Equals(ADMIN_PERMISSION) ? "YES" : "NO [!POTENTIAL MISSING PERMISSIONS!]";
+      if (string.IsNullOrWhiteSpace(s) || !ulong.TryParse(s, out var permissions))
+      {
+          return "NO [!POTENTIAL MISSING PERMISSIONS!]";
+      }
+
+      return (permissions & ADMINISTRATOR_PERMISSION) == ADMINISTRATOR_PERMISSION
+          ? "YES"
+          : "NO [!POTENTIAL MISSING PERMISSIONS!]";
   }
 
   public static string GlobalTimeout(bool? b)
