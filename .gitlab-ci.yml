@@ -1,0 +1,74 @@
+stages:
+  - build
+  - upload
+  - release
+
+variables:
+  DOTNET_IMAGE: "mcr.microsoft.com/dotnet/sdk:9.0"
+  PROJECT: "src/ZehNuker.csproj"
+  RUNTIME: "win-x64"
+  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/zehnuker/${CI_COMMIT_TAG}"
+
+build:self-contained:
+  stage: build
+  image: ${DOTNET_IMAGE}
+  script:
+    - dotnet publish ${PROJECT} -c Release -r ${RUNTIME} --self-contained true -o publish/self-contained
+    - cd publish/self-contained && zip -r ../../ZehNuker-${RUNTIME}-self-contained.zip ZehNuker.exe
+  artifacts:
+    name: "ZehNuker-${RUNTIME}-self-contained-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ZehNuker-${RUNTIME}-self-contained.zip
+    expire_in: 1 month
+
+build:runtime-dependent:
+  stage: build
+  image: ${DOTNET_IMAGE}
+  script:
+    - dotnet publish ${PROJECT} -c Release -r ${RUNTIME} --self-contained false /p:PublishSingleFile=true /p:EnableCompressionInSingleFile=false -o publish/runtime
+    - cd publish/runtime && zip -r ../../ZehNuker-${RUNTIME}-runtime.zip ZehNuker.exe
+  artifacts:
+    name: "ZehNuker-${RUNTIME}-runtime-${CI_COMMIT_SHORT_SHA}"
+    paths:
+      - ZehNuker-${RUNTIME}-runtime.zip
+    expire_in: 1 month
+
+upload:
+  stage: upload
+  image: curlimages/curl:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - build:self-contained
+    - build:runtime-dependent
+  script:
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+           --upload-file ZehNuker-${RUNTIME}-self-contained.zip \
+           "${PACKAGE_REGISTRY_URL}/ZehNuker-${RUNTIME}-self-contained.zip"
+    - |
+      curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
+           --upload-file ZehNuker-${RUNTIME}-runtime.zip \
+           "${PACKAGE_REGISTRY_URL}/ZehNuker-${RUNTIME}-runtime.zip"
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG
+  needs:
+    - upload
+  script:
+    - echo "Creating release for ${CI_COMMIT_TAG}"
+  release:
+    name: "ZehNuker ${CI_COMMIT_TAG}"
+    tag_name: "${CI_COMMIT_TAG}"
+    description: "Automated release for ${CI_COMMIT_TAG}"
+    assets:
+      links:
+        - name: "ZehNuker ${RUNTIME} (self-contained)"
+          url: "${PACKAGE_REGISTRY_URL}/ZehNuker-${RUNTIME}-self-contained.zip"
+          link_type: "package"
+        - name: "ZehNuker ${RUNTIME} (runtime-dependent)"
+          url: "${PACKAGE_REGISTRY_URL}/ZehNuker-${RUNTIME}-runtime.zip"
+          link_type: "package"
